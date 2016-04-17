@@ -1,16 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-<<<<<<< 826a1f269f93f781c385e74442a886a9bc2616f4
-  <MonoDevelop.Ide.Workbench ActiveDocument="../cripto/main.cpp">
-    <Files>
-      <File FileName="../cripto/main.cpp" Line="1" Column="1" />
-      <File FileName="../test1/test1/client.cpp" Line="1" Column="1" />
-=======
   <MonoDevelop.Ide.Workbench ActiveDocument="kripto/main.cpp">
     <Files>
       <File FileName="kripto/main.cpp" Line="2" Column="2" />
       <File FileName="kripto/main.h" Line="20" Column="20" />
->>>>>>> 65759b3f129b4d4f439a607f6a69807ac0f4276c
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
