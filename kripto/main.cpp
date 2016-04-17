@@ -116,16 +116,16 @@ void shift() {
 	}
 }
 
-int mult(int a, int b){
-
-	return 
-}
-
-void linearTransformation() {
-	for(int i=0; i<8; i++) {
-		for(int j=0; j<8; j++){
-			for(int h=0; h<8; h++ ) v_AfterShift[h] = v[(h+i)%8];
-			textTransform[i][j] = 
-		}
-	}
-}
+//int mult(int a, int b){
+//
+//	return 
+//}
+//
+//void linearTransformation() {
+//	for(int i=0; i<8; i++) {
+//		for(int j=0; j<8; j++){
+//			for(int h=0; h<8; h++ ) v_AfterShift[h] = v[(h+i)%8];
+//			textTransform[i][j] = 
+//		}
+//	}
+//}
