@@ -1,0 +1,131 @@
+﻿#include "main.h"
+using namespace std;
+
+int d;
+int messageLength;
+int addMessageLength;
+byte* messageStart;
+byte* messageAddition;
+byte* endOfMessage;
+byte ciK [8][8];
+byte ciN [8][8];
+byte textReplace [8][8];
+byte textShift [8][8];
+byte textTransform [8][8];
+
+int main (int argc, char *argv[])
+{
+	//addition();
+	//addConstIteration_k_(textNorm, i);
+	//replace();
+	addConstIteration_k_(textNorm, 0);
+	cout << endl;
+	replace();
+	cout << endl;
+	shift();
+	cout << endl;
+	//addConstIteration_n_(5);
+	return 0;
+}
+
+void addition() {
+	cout << "enter your messege" << endl;
+	messageStart = new byte[200];
+	cin >> messageStart;
+	messageLength = strlen((char*)messageStart);
+	d = 64 - ((messageLength + 13) % 64);
+	addMessageLength = messageLength + d + 12;
+	messageAddition = new byte[addMessageLength];
+
+	int point = 0;		//Номер позиции на данный момент в конечном массиве
+	for(; point<messageLength; point++) {		//Записываем в начало массива начальное не преобразованное сообщение
+		messageAddition[point] = messageStart[point];  //Записываем начальное сообщение
+		cout << point << "-1-" << messageAddition[point] << endl;
+	}
+	messageAddition[point] = 0x80;		//Записываем 1 элемент d
+	point++;
+	cout << point << "-2-" << (int)messageAddition[point] << endl;
+	for(; point<(messageLength+d); point++) {		//Записываем цифру 0 в массив d раз
+		messageAddition[point] = 0;		//Дописываем нужное количество нолей
+		cout << point << "-2-" << (int)messageAddition[point]  << endl;
+	}
+	for(int len = messageLength; point < addMessageLength; point++ ){ 		//Записываем в последние 12 байт число N
+		messageAddition[point] = len%256;
+		len = (int) (len / 256);
+		cout << point << "-3-" << (int)messageAddition[point]  << endl;
+		if(len < 256) {
+			point++;
+			while(point < addMessageLength) {
+				messageAddition[point] = 0;
+				cout << point << "-4-" << (int)messageAddition[point]  << endl;
+				point++;
+			}
+			break;
+		}
+	}
+	cout << messageAddition << endl;
+	cout << strlen((char*)messageAddition);
+}
+void addConstIteration_k_(unsigned char m[][8],int v) {
+	for(int i=0; i<8; i++) {
+		ciK[i][0] = m[i][0] ^ ((i << 4)^v);
+		cout << hex << (int)ciK[i][0] << "  ";
+		for(int j=1; j<8; j++) {
+			ciK[i][j] = m[i][j];
+			cout << hex << (int)ciK[i][j] << "  ";
+		}
+		cout << "\n";
+	}
+}
+void addConstIteration_n_(int v) {
+	for(int i=0; i<8; i++ ) {
+		ciN[i][0] = 0xF3;
+		for(int j=1; j<7; j++) {
+			ciN[i][j] = 0xF0;
+		}
+		ciN[i][7] = ((7-i)<<4)^v;
+	}
+	for(int i=0; i<8; i++ ) {
+		for(int j=1; j<8; j++) {
+			cout << (int)ciN[i][j] << "  ";
+		}
+		cout << endl;
+	}
+}
+
+void replace() {
+	for(int i=0; i<8; i++ ) {
+		for(int j=0; j<8; j++) {
+			textReplace[i][j] = Pi[j%4][ciK[i][j]/16][ciK[i][j]%16];
+			cout << hex << (int)textReplace[i][j] << "  ";
+		}
+		cout << endl;
+	}
+}
+void shift() {
+	for(int i=0; i<8; i++ ) {
+		for(int j=0; j<8; j++) {
+			textShift[(j+i)%8][i] = textReplace[j][i];
+		}
+	}
+	for(int i=0; i<8; i++ ) {
+		for(int j=0; j<8; j++) {
+			cout << hex << (int)textShift[i][j] << "  ";
+		}
+		cout << endl;
+	}
+}
+
+int mult(int a, int b){
+
+	return 
+}
+
+void linearTransformation() {
+	for(int i=0; i<8; i++) {
+		for(int j=0; j<8; j++){
+			for(int h=0; h<8; h++ ) v_AfterShift[h] = v[(h+i)%8];
+			textTransform[i][j] = 
+		}
+	}
+}
