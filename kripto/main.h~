@@ -87,12 +87,30 @@ unsigned char Pi[4][16][16] = { {{0xA8, 0x43, 0x5F, 0x06, 0x6B, 0x75, 0x6C, 0x59
 
 unsigned char v[8] = {0x01, 0x01, 0x05, 0x01, 0x08, 0x06, 0x07, 0x04};
 unsigned char v_AfterShift[8];
+int d;
+int messageLength;
+int addMessageLength;
+byte* messageStart;
+byte* messageAddition;
+byte* endOfMessage;
+byte ciK [8][8];
+byte ciN [8][8];
+byte textReplace [8][8];
+byte textShift [8][8];
+byte textTransform [8][8];
+unsigned short mod = 0x1d;
+
+
+
 void test();
+void transpon();
 void addition();
 void addConstIteration_k_(unsigned char m[][8],int v);
 void addConstIteration_n_(int v);
 void replace();
 void shift();
+byte modM(unsigned short a);
+unsigned char mult(byte column, byte shiftV);
 void linearTransformation();
 
 #endif

@@ -2,8 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="kripto/main.cpp">
     <Files>
-      <File FileName="kripto/main.cpp" Line="11" Column="11" />
-      <File FileName="kripto/main.h" Line="1" Column="1" />
+      <File FileName="kripto/main.cpp" Line="2" Column="2" />
+      <File FileName="kripto/main.h" Line="23" Column="23" />
+      <File FileName="../../testFile/Chess/C#/Chess/Form1.cs" Line="53" Column="53" />
+      <File FileName="../../testFile/Chess/C#/Chess/intellectMove.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
