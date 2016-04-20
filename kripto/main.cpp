@@ -6,9 +6,9 @@ int main (int argc, char *argv[])
 	//addition();
 	transpon();
 	cout << endl;
-	addConstIteration_k_(textNorm, 0);
+	addConstIteration_n_(textNorm, 0);
 	cout << endl;
-	replace();
+	replace(ciN);
 	cout << endl;
 	shift();
 	cout << endl;
@@ -79,26 +79,35 @@ void addConstIteration_k_(unsigned char m[][8],int v) {
 		cout << "\n";
 	}
 }
-void addConstIteration_n_(int v) {
+void addConstIteration_n_(unsigned char m[][8], int v) {
 	for(int i=0; i<8; i++ ) {
-		ciN[i][0] = 0xF3;
+		ciN[0][i] = 0xF3;
 		for(int j=1; j<7; j++) {
-			ciN[i][j] = 0xF0;
+			ciN[j][i] = 0xF0;
 		}
-		ciN[i][7] = ((7-i)<<4)^v;
+		ciN[7][i] = ((7-i)<<4)^v;
+	}
+	int buf = 0;
+	for(int i=0; i<8; i++ ) {
+		buf = 0;
+		for(int j=0; j<8; j++) {
+			buf += (int)(ciN[j][i]) + (int)(m[j][i]);
+			ciN[j][i] = buf;
+			buf /= 256;
+		}
 	}
 	for(int i=0; i<8; i++ ) {
-		for(int j=1; j<8; j++) {
-			cout << (int)ciN[i][j] << "  ";
+		for(int j=0; j<8; j++) {
+			cout << hex << (int)ciN[i][j] << "  ";
 		}
 		cout << endl;
 	}
 }
 
-void replace() {
+void replace(unsigned char arr[][8]) {
 	for(int i=0; i<8; i++ ) {
 		for(int j=0; j<8; j++) {
-			textReplace[i][j] = Pi[i%4][ciK[i][j]/16][ciK[i][j]%16];
+			textReplace[i][j] = Pi[i%4][arr[i][j]/16][arr[i][j]%16];
 		}
 	}
 	for(int i=0; i<8; i++ ) {
