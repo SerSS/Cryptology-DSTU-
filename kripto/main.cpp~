@@ -3,80 +3,172 @@ using namespace std;
 
 int main (int argc, char *argv[])
 {
-	//addition();
-	transpon();
+	stringText = (unsigned char*)"000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F";
+	messageLength = (strlen((char*)stringText));
+	messageStart = new byte[messageLength];
+
+	if(test == true) {
+		for(int i=0; i < messageLength; i+=2) {
+			messageStart[i/2] = stringToInt(stringText[i], stringText[i+1]);
+		}
+		cout << "message start=" << endl;
+		for(int i=0; i < messageLength/2; i++) {
+			cout << hex << (int)messageStart[i] << "  ";
+		}
+		cout << endl;
+	}
+	else {
+		for(int i=0; i < messageLength; i+=2) {
+				messageStart[i] = stringText[i];
+		}
+	}
+
+	addition();			//Дополняем сообщение
+	cout << hex << "messageAddition:" << endl;
+	for(int i=0; i<addMessageLength; i++) cout << (int)messageAddition[i] << " ";
 	cout << endl;
-	addConstIteration_n_(textNorm, 0);
-	cout << endl;
-	replace(ciN);
-	cout << endl;
-	shift();
-	cout << endl;
-	linearTransformation();
-	cout << endl;
+	numberBlocks = (int)(addMessageLength/64);
+
+	for(currentBlock = 0; currentBlock < numberBlocks; currentBlock++) {
+		cout << endl;
+		textInBlock();
+
+		iteration = 0;
+		runTranfsormK();
+		iteration = 0;
+		runTranfsormN();
+		addArray(afterTransformK, afterTransformN);
+
+		cout << "end block" << currentBlock << ":" << endl;
+		if(currentBlock == 0) {
+			resultAdd[0][0] ^= 0x40;
+			for(int i=0; i<8; i++) {
+				for(int j=0; j<8; j++) {
+					endHash[i][j] = resultAdd[i][j];
+					cout << hex << (int)endHash[i][j] << "  ";
+				}
+				cout << endl;
+			}
+		}
+		else {
+			addArray(resultAdd, endHash);
+			for(int i=0; i<8; i++) {
+				for(int j=0; j<8; j++) {
+					endHash[i][j] = resultAdd[i][j];
+					cout << hex << (int)endHash[i][j] << "  ";
+				}
+				cout << endl;
+			}
+		}
+	}
 	return 0;
 }
 
-void transpon(){
-	for(int i=0; i<8; i++){
-		for(int j=0; j<8; j++){
-			textNorm[i][j] = textNorm1[j][i];
-			//cout << hex << (int)textNorm[i][j] << "  ";
-		}
-		//cout << endl;
-	}
-}
-
 void addition() {
-	cout << "enter your messege" << endl;
-	messageStart = new byte[200];
-	cin >> messageStart;
-	messageLength = strlen((char*)messageStart);
+	messageLength /= 2;
 	d = 64 - ((messageLength + 13) % 64);
-	addMessageLength = messageLength + d + 12;
+	addMessageLength = messageLength + d + 13;//12;
 	messageAddition = new byte[addMessageLength];
 
 	int point = 0;		//Номер позиции на данный момент в конечном массиве
 	for(; point<messageLength; point++) {		//Записываем в начало массива начальное не преобразованное сообщение
 		messageAddition[point] = messageStart[point];  //Записываем начальное сообщение
-		cout << point << "-1-" << messageAddition[point] << endl;
 	}
 	messageAddition[point] = 0x80;		//Записываем 1 элемент d
 	point++;
-	cout << point << "-2-" << (int)messageAddition[point] << endl;
 	for(; point<(messageLength+d); point++) {		//Записываем цифру 0 в массив d раз
 		messageAddition[point] = 0;		//Дописываем нужное количество нолей
-		cout << point << "-2-" << (int)messageAddition[point]  << endl;
 	}
-	for(int len = messageLength; point < addMessageLength; point++ ){ 		//Записываем в последние 12 байт число N
+	for(int len = (messageLength*8); point < addMessageLength; point++ ){ 		//Записываем в последние 12 байт число N
 		messageAddition[point] = len%256;
 		len = (int) (len / 256);
-		cout << point << "-3-" << (int)messageAddition[point]  << endl;
 		if(len < 256) {
+			point++;
+			messageAddition[point] = len;
 			point++;
 			while(point < addMessageLength) {
 				messageAddition[point] = 0;
-				cout << point << "-4-" << (int)messageAddition[point]  << endl;
 				point++;
 			}
 			break;
 		}
 	}
-	cout << messageAddition << endl;
-	cout << strlen((char*)messageAddition);
 }
+
+void runTranfsormK() {
+	if(iteration == 0 && currentBlock == 0) {
+		for(int i=0; i<8; i++) {
+			for (int j=0; j<8; j++) {
+				textTransform[i][j] = textNorm[i][j];
+			}
+		}
+		textTransform[0][0] ^= 0x40;
+	}
+	else if(iteration == 0 && currentBlock != 0) {
+		for(int i=0; i<8; i++) {
+			for (int j=0; j<8; j++) {
+				textTransform[i][j] = endHash[i][j] ^ textNorm[i][j];
+			}
+		}
+	}
+
+	addConstIteration_k_(textTransform, iteration);
+	replace(ciK);
+	shift();
+	linearTransformation();
+
+	iteration++;
+	if(iteration >= 10) { 
+		for(int i=0; i<8; i++) {
+			for (int j=0; j<8; j++) {
+				afterTransformK[i][j] = textTransform[i][j];
+			}
+		}
+		return;
+	}
+	else runTranfsormK();		//Рекурсия
+}
+
+void runTranfsormN() {
+	if(iteration == 0) {
+		for(int i=0; i<8; i++) {
+			for (int j=0; j<8; j++) {
+				textTransform[i][j] = textNorm[i][j];
+			}
+		}
+	}
+
+	addConstIteration_n_(textTransform, iteration);
+	replace(ciN);
+	shift();
+	linearTransformation();
+
+	iteration++;
+	if(iteration >= 10){
+		for(int i=0; i<8; i++) {
+			for (int j=0; j<8; j++) {
+				afterTransformN[i][j] = textTransform[i][j];
+			}
+		}
+		return;
+	}
+	else runTranfsormN();		//Рекурсия
+}
+
+void transpon(){
+	for(int i=0; i<8; i++){
+		for(int j=0; j<8; j++){
+			textNorm[i][j] = textNorm_1[j][i];
+		}
+	}
+}
+
 void addConstIteration_k_(unsigned char m[][8],int v) {
 	for(int i=0; i<8; i++) {
 		ciK[0][i] = m[0][i] ^ ((i << 4)^v);
 		for(int j=1; j<8; j++) {
 			ciK[j][i] = m[j][i];
 		}
-	}
-	for(int i=0; i<8; i++) {
-		for(int j=0; j<8; j++) {
-			cout << hex << (int)ciK[i][j] << "  ";
-		}
-		cout << "\n";
 	}
 }
 void addConstIteration_n_(unsigned char m[][8], int v) {
@@ -96,12 +188,6 @@ void addConstIteration_n_(unsigned char m[][8], int v) {
 			buf /= 256;
 		}
 	}
-	for(int i=0; i<8; i++ ) {
-		for(int j=0; j<8; j++) {
-			cout << hex << (int)ciN[i][j] << "  ";
-		}
-		cout << endl;
-	}
 }
 
 void replace(unsigned char arr[][8]) {
@@ -110,24 +196,12 @@ void replace(unsigned char arr[][8]) {
 			textReplace[i][j] = Pi[i%4][arr[i][j]/16][arr[i][j]%16];
 		}
 	}
-	for(int i=0; i<8; i++ ) {
-		for(int j=0; j<8; j++) {
-			cout << hex << (int)textReplace[i][j] << "  ";
-		}
-		cout << endl;
-	}
 }
 void shift() {
 	for(int i=0; i<8; i++ ) {
 		for(int j=0; j<8; j++) {
 			textShift[i][(j+i)%8] = textReplace[i][j];
 		}
-	}
-	for(int i=0; i<8; i++ ) {
-		for(int j=0; j<8; j++) {
-			cout << hex << (int)textShift[i][j] << "  ";
-		}
-		cout << endl;
 	}
 }
 
@@ -156,6 +230,12 @@ unsigned char mult(byte column, byte shiftV){
 
 void linearTransformation() {
 	byte column[8];
+	for(int i=0; i<8; i++ ) {
+		for(int j=0; j<8; j++) {
+			textTransform[i][j] = 0;
+		}
+	}
+
 	for(int i=0; i<8; i++) {
 		for(int h=0; h<8; h++ )    v_AfterShift[(h+i)%8] = v[h];		//циклический сдвиг V на i
 
@@ -164,8 +244,78 @@ void linearTransformation() {
 				column[h] = textShift[h][j];		//записываем колонку в массив
 				textTransform[i][j] ^= mult(column[h], v_AfterShift[h]); 	//вызов функции mult
 			}
-			cout << hex << (int)textTransform[i][j] << "  ";
+		}
+	}
+}
+
+void addArray(byte arr1[8][8], byte arr2[8][8]) {
+	for(int i=0; i<8; i++) {
+		for(int j=0; j<8; j++) {
+			resultAdd[i][j] = arr1[i][j] ^ arr2[i][j];
+		}
+	}
+}
+
+void printArr(byte arr[8][8]) {
+	for(int i=0; i<8; i++) {
+		for(int j=0; j<8; j++) {
+			cout << hex << (int)(arr[i][j]) << "  ";
 		}
 		cout << endl;
+	}
+}
+
+int stringToInt(unsigned char symb1, unsigned char symb2) {
+	if(symb1 == '0') return getIntFromChar(symb2);
+	else {
+		return (getIntFromChar(symb1) * 16 + getIntFromChar(symb2));
+	}
+}
+
+int getIntFromChar(unsigned char symbol) {
+	switch(symbol) {
+		case '0':
+			return 0;
+		case '1':
+			return 1;
+		case '2':
+			return 2;
+		case '3':
+			return 3;
+		case '4':
+			return 4;
+		case '5':
+			return 5;
+		case '6':
+			return 6;
+		case '7':
+			return 7;
+		case '8':
+			return 8;
+		case '9':
+			return 9;
+		case 'A':
+			return 10;
+		case 'B':
+			return 11;
+		case 'C':
+			return 12;
+		case 'D':
+			return 13;
+		case 'E':
+			return 14;
+		case 'F':
+			return 15;
+	default:
+		return 0;
+	}
+}
+
+void textInBlock() {
+	int i = currentBlock * 64;
+	textNorm[i%8][(int)(i/8)] = messageAddition[i];
+	i++;
+	for(; i < addMessageLength && (i % 64) != 0; i++) {
+		textNorm[i%8][(int)(i/8)] = messageAddition[i];
 	}
 }

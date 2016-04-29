@@ -10,7 +10,9 @@
 
 typedef unsigned char byte;
 
-unsigned char textNorm1[8][8] = {{0,1,2,3,4,5,6,7},
+bool test = true;
+
+unsigned char textNorm_1[8][8] = {{0,1,2,3,4,5,6,7},
                          {8,9,0xa,0xb,0xc,0xd,0xe,0xf},
                          {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17},
                          {0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f},
@@ -91,19 +93,29 @@ unsigned char v_AfterShift[8];
 int d;
 int messageLength;
 int addMessageLength;
+byte* stringText;
 byte* messageStart;
 byte* messageAddition;
-byte* endOfMessage;
 byte ciK [8][8];
 byte ciN [8][8];
 byte textReplace [8][8];
 byte textShift [8][8];
 byte textTransform [8][8];
+byte afterTransformK[8][8];
+byte afterTransformN[8][8];
+byte resultAdd[8][8];
+
+byte firstTransformation[8][8];
+byte secondTransformation[8][8];
+byte endHash[8][8];
+
+int iteration = 0;
 unsigned short mod = 0x1d;
+int numberBlocks = 0;
+int currentBlock = 0;
 
 
 
-void test();
 void transpon();
 void addition();
 void addConstIteration_k_(unsigned char m[][8], int v);
@@ -113,5 +125,15 @@ void shift();
 byte modM(unsigned short a);
 unsigned char mult(byte column, byte shiftV);
 void linearTransformation();
+
+void runTranfsormK();
+void runTranfsormN();
+
+void addArray(byte arr1[8][8], byte arr2[8][8]);
+void printArr(byte arr[8][8]);	
+
+int getIntFromChar(unsigned char symbol);
+int stringToInt(unsigned char symb1, unsigned char symb2);
+void textInBlock();
 
 #endif
